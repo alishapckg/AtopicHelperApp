@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en" data-light-theme="light" data-dark-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Appleseed" />
+    <meta name="generator" content="Ignite v0.6.0" />
+    <title>Home – Atopic Helper Title</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/css/ignite-core.min.css" rel="stylesheet" />
+    <link href="https://www.example.com/home" rel="canonical" />
+    <link type="application/rss+xml" title="RSS Feed" href="/feed.rss" rel="alternate" />
+    <script>(function() {
+    function getThemePreference() {
+        return localStorage.getItem('custom-theme') || 'auto';
+    }
+
+    function applyTheme(themeID) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const lightThemeID = document.documentElement.getAttribute('data-light-theme') || 'light';
+        const darkThemeID = document.documentElement.getAttribute('data-dark-theme') || 'dark';
+        const actualThemeID = themeID === 'auto' ? (prefersDark ? darkThemeID : lightThemeID) : themeID;
+
+        document.documentElement.setAttribute('data-bs-theme', actualThemeID);
+        document.documentElement.setAttribute('data-theme-state', themeID);
+    }
+
+    function applySyntaxTheme() {
+        const syntaxTheme = getComputedStyle(document.documentElement)
+            .getPropertyValue('--syntax-highlight-theme').trim().replace(/"/g, '');
+
+        if (!syntaxTheme) return;
+
+        document.querySelectorAll('link[data-highlight-theme]').forEach(link => {
+            link.setAttribute('disabled', 'disabled');
+        });
+
+        const themeLink = document.querySelector(`link[data-highlight-theme="${syntaxTheme}"]`);
+        if (themeLink) {
+            themeLink.removeAttribute('disabled');
+        }
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const currentTheme = getThemePreference();
+        if (currentTheme === 'auto') {
+            applyTheme('auto');
+            applySyntaxTheme();
+        }
+    });
+
+    const savedTheme = getThemePreference();
+    applyTheme(savedTheme);
+    applySyntaxTheme();
+})();
+</script>
+    <meta property="og:site_name" content="Atopic Helper Site Name" />
+    <meta property="og:title" content="Home" />
+    <meta name="twitter:title" content="Home" />
+    <meta property="og:url" content="https://www.example.com/home" />
+    <meta name="twitter:domain" content="example.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:dnt" content="on" />
+  </head>
+  <body class="container">
+    <header>
+      <nav class="navbar navbar-expand-md">
+        <div class="container flex-wrap flex-lg-nowrap">
+          <div class="me-2 me-md-auto">
+            <a href="/" class="d-inline-flex align-items-center navbar-brand">Atopic Helper</a>
+          </div>
+          <button type="button" class="navbar-toggler btn" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+          <div id="navbarCollapse" class="collapse navbar-collapse">
+            <ul class="navbar-nav mb-2 mb-md-0 col justify-content-end">
+              <li class="nav-item"><a href="/home/" class="nav-link active text-nowrap" aria-current="page">Skin Tracker</a></li>
+              <li class="nav-item"><a href="/food-tracker/" class="nav-link text-nowrap">Food Tracker</a></li>
+              <li class="nav-item"><a href="/doctor-appointment-preparation/" class="nav-link text-nowrap">Appointment Preparation</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class="ig-main-content">
+      <div class="vstack">
+        <p class="mb-0 align-self-center">Skin Tracker</p>
+        <div class="mb-0 align-self-center hstack gap-3">
+          <p class="mb-0 align-self-center">Selected date</p>
+        </div>
+        <div class="mb-0 align-self-center"> 
+          <div class="calendar-container"> 
+            <h2 class="month-title">April 2026</h2> 
+            <div class="calendar-grid"> 
+              <div class="day-header">
+                Mon
+              </div>
+              <div class="day-header">
+                Tue
+              </div>
+              <div class="day-header">
+                Wed
+              </div>
+              <div class="day-header">
+                Thu
+              </div>
+              <div class="day-header">
+                Fri
+              </div>
+              <div class="day-header">
+                Sat
+              </div>
+              <div class="day-header">
+                Sun
+              </div>
+              <div class="day-cell"></div>
+              <div class="day-cell"></div>
+              <div class="day-cell">
+                1
+              </div>
+              <div class="day-cell">
+                2
+              </div>
+              <div class="day-cell">
+                3
+              </div>
+              <div class="day-cell">
+                4
+              </div>
+              <div class="day-cell">
+                5
+              </div>
+              <div class="day-cell">
+                6
+              </div>
+              <div class="day-cell">
+                7
+              </div>
+              <div class="day-cell">
+                8
+              </div>
+              <div class="day-cell">
+                9
+              </div>
+              <div class="day-cell">
+                10
+              </div>
+              <div class="day-cell">
+                11
+              </div>
+              <div class="day-cell">
+                12
+              </div>
+              <div class="day-cell">
+                13
+              </div>
+              <div class="day-cell">
+                14
+              </div>
+              <div class="day-cell">
+                15
+              </div>
+              <div class="day-cell">
+                16
+              </div>
+              <div class="day-cell">
+                17
+              </div>
+              <div class="day-cell">
+                18
+              </div>
+              <div class="day-cell">
+                19
+              </div>
+              <div class="day-cell">
+                20
+              </div>
+              <div class="day-cell">
+                21
+              </div>
+              <div class="day-cell">
+                22
+              </div>
+              <div class="day-cell">
+                23
+              </div>
+              <div class="day-cell">
+                24
+              </div>
+              <div class="day-cell">
+                25
+              </div>
+              <div class="day-cell">
+                26
+              </div>
+              <div class="day-cell">
+                27
+              </div>
+              <div class="day-cell">
+                28
+              </div>
+              <div class="day-cell">
+                29
+              </div>
+              <div class="day-cell today">
+                30
+              </div> 
+            </div> 
+          </div> 
+          <style>
+        .calendar-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 24px;
+            background-color: #F9F9FB;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        
+        .month-title {
+            text-align: center;
+            margin: 0 0 20px 0;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        
+        .day-header {
+            font-weight: bold;
+            text-align: center;
+            color: #777;
+            font-size: 0.85rem;
+            padding-bottom: 8px;
+        }
+        
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            color: #444;
+            transition: all 0.2s ease;
+        }
+        
+        .day-cell:not(.today):hover {
+            background-color: #e9e9eb;
+        }
+        
+        .today {
+            background-color: #5856D6;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(88, 86, 214, 0.3);
+        }
+    </style>
+        </div>
+      </div>
+    </div>
+    <p class="text-center mt-5">Created in Swift with <a href="https://github.com/twostraws/Ignite">Ignite</a></p>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/ignite-core.js"></script>
+  </body>
+</html>
