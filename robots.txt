@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alishapckg.github.io/AtopicHelperApp//sitemap.xml

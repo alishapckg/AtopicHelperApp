@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en" data-light-theme="light" data-dark-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Appleseed" />
+    <meta name="generator" content="Ignite v0.6.0" />
+    <title>Home – Atopic Helper Title</title>
+    <link href="/AtopicHelperApp/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/AtopicHelperApp/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/AtopicHelperApp/css/ignite-core.min.css" rel="stylesheet" />
+    <link href="https://alishapckg.github.io/AtopicHelperApp/doctor-appointment-preparation" rel="canonical" />
+    <link type="application/rss+xml" title="RSS Feed" href="/AtopicHelperApp/feed.rss" rel="alternate" />
+    <script>(function() {
+    function getThemePreference() {
+        return localStorage.getItem('custom-theme') || 'auto';
+    }
+
+    function applyTheme(themeID) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const lightThemeID = document.documentElement.getAttribute('data-light-theme') || 'light';
+        const darkThemeID = document.documentElement.getAttribute('data-dark-theme') || 'dark';
+        const actualThemeID = themeID === 'auto' ? (prefersDark ? darkThemeID : lightThemeID) : themeID;
+
+        document.documentElement.setAttribute('data-bs-theme', actualThemeID);
+        document.documentElement.setAttribute('data-theme-state', themeID);
+    }
+
+    function applySyntaxTheme() {
+        const syntaxTheme = getComputedStyle(document.documentElement)
+            .getPropertyValue('--syntax-highlight-theme').trim().replace(/"/g, '');
+
+        if (!syntaxTheme) return;
+
+        document.querySelectorAll('link[data-highlight-theme]').forEach(link => {
+            link.setAttribute('disabled', 'disabled');
+        });
+
+        const themeLink = document.querySelector(`link[data-highlight-theme="${syntaxTheme}"]`);
+        if (themeLink) {
+            themeLink.removeAttribute('disabled');
+        }
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const currentTheme = getThemePreference();
+        if (currentTheme === 'auto') {
+            applyTheme('auto');
+            applySyntaxTheme();
+        }
+    });
+
+    const savedTheme = getThemePreference();
+    applyTheme(savedTheme);
+    applySyntaxTheme();
+})();
+</script>
+    <meta property="og:site_name" content="Atopic Helper Site Name" />
+    <meta property="og:title" content="Home" />
+    <meta name="twitter:title" content="Home" />
+    <meta property="og:url" content="https://alishapckg.github.io/AtopicHelperApp/doctor-appointment-preparation" />
+    <meta name="twitter:domain" content="alishapckg.github.io" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:dnt" content="on" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body class="container"> 
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+    :root {
+      --gold: #c4a46e;
+      --gold-dark: #7a5a1e;
+      --gold-deeper: #5a3e10;
+      --cream: #FFFDF5;
+      --cream-mid: #f0e6cf;
+      --text-dark: #2c1f08;
+      --text-mid: #5a3e10;
+      --text-light: #a07840;
+      --border: #e8d9b8;
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+    }
+
+    #top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+
+    .top-bar-logo {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-dark);
+      text-decoration: none;
+      letter-spacing: -0.2px;
+    }
+    .top-bar-logo span { color: var(--gold); }
+
+    #top-bar-nav { display: none; gap: 4px; }
+    #top-bar-nav.visible { display: flex; }
+    #top-bar-nav a {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-light);
+      text-decoration: none;
+      transition: background 0.18s, color 0.18s;
+    }
+    #top-bar-nav a:hover { background: var(--cream-mid); color: var(--text-dark); }
+    #top-bar-nav a.active { background: var(--cream-mid); color: var(--gold-dark); font-weight: 500; }
+
+    #top-bar-auth { display: flex; align-items: center; gap: 12px; }
+    #guest-ui { display: none; }
+    #user-ui  { display: none; align-items: center; gap: 12px; }
+
+    .login-link {
+      padding: 8px 18px;
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gold-dark);
+      text-decoration: none;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .login-link:hover { background: var(--cream-mid); border-color: var(--gold-dark); }
+
+    #user-email { font-size: 14px; font-weight: 500; color: var(--text-mid); }
+    #logout-btn {
+      padding: 7px 14px;
+      background: none;
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--gold-dark);
+      cursor: pointer;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    #logout-btn:hover { background: var(--cream-mid); border-color: var(--gold-dark); }
+  </style> 
+    <div id="top-bar"> 
+      <a class="top-bar-logo" href="/AtopicHelperApp/">Atopic <span>Helper</span></a> 
+      <nav id="top-bar-nav"> 
+        <a href="/AtopicHelperApp/">Skin Tracker</a> 
+        <!-- <a href="/AtopicHelperApp/food-tracker">Food Tracker</a> --> 
+        <!-- <a href="/AtopicHelperApp/doctor-appointment-preparation">Appointment Prep</a> --> 
+      </nav> 
+      <div id="top-bar-auth"> 
+        <div id="guest-ui"> 
+          <a class="login-link" href="/AtopicHelperApp/auth">Log in</a> 
+        </div> 
+        <div id="user-ui"> 
+          <span id="user-email"></span> 
+          <button id="logout-btn">Log out</button> 
+        </div> 
+      </div> 
+    </div>
+    <div class="ig-main-content">
+      <h1>DoctorAppointmentPreparation</h1>
+    </div>
+    <script src="/AtopicHelperApp/supabase-config.js"></script>
+    <script>  function setActiveNav() {
+    var path = window.location.pathname;
+    document.querySelectorAll('#top-bar-nav a').forEach(function(a) {
+      a.classList.toggle('active', a.getAttribute('href') === path);
+    });
+  }
+
+  async function updateAuthUI() {
+    if (typeof window.SupabaseAuth === 'undefined') {
+      setTimeout(updateAuthUI, 100);
+      return;
+    }
+    const { session } = await window.SupabaseAuth.getSession();
+    const guestUI = document.getElementById('guest-ui');
+    const userUI  = document.getElementById('user-ui');
+    const nav     = document.getElementById('top-bar-nav');
+    const emailEl = document.getElementById('user-email');
+
+    if (session && session.user) {
+      guestUI.style.display = 'none';
+      userUI.style.display  = 'flex';
+      nav.classList.add('visible');
+      emailEl.textContent = session.user.email.split('@')[0];
+    } else {
+      guestUI.style.display = 'block';
+      userUI.style.display  = 'none';
+      nav.classList.remove('visible');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    setActiveNav();
+    updateAuthUI();
+
+    var logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async function() {
+        await window.SupabaseAuth.signOut();
+        window.location.href = '/AtopicHelperApp/auth';
+      });
+    }
+  });</script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/ignite-core.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en" data-light-theme="light" data-dark-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Appleseed" />
+    <meta name="generator" content="Ignite v0.6.0" />
+    <title>Skin Tracker – Atopic Helper – Atopic Helper Title</title>
+    <link href="/AtopicHelperApp/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/AtopicHelperApp/css/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="/AtopicHelperApp/css/ignite-core.min.css" rel="stylesheet" />
+    <link href="https://alishapckg.github.io/AtopicHelperApp/" rel="canonical" />
+    <link type="application/rss+xml" title="RSS Feed" href="/AtopicHelperApp/feed.rss" rel="alternate" />
+    <script>(function() {
+    function getThemePreference() {
+        return localStorage.getItem('custom-theme') || 'auto';
+    }
+
+    function applyTheme(themeID) {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const lightThemeID = document.documentElement.getAttribute('data-light-theme') || 'light';
+        const darkThemeID = document.documentElement.getAttribute('data-dark-theme') || 'dark';
+        const actualThemeID = themeID === 'auto' ? (prefersDark ? darkThemeID : lightThemeID) : themeID;
+
+        document.documentElement.setAttribute('data-bs-theme', actualThemeID);
+        document.documentElement.setAttribute('data-theme-state', themeID);
+    }
+
+    function applySyntaxTheme() {
+        const syntaxTheme = getComputedStyle(document.documentElement)
+            .getPropertyValue('--syntax-highlight-theme').trim().replace(/"/g, '');
+
+        if (!syntaxTheme) return;
+
+        document.querySelectorAll('link[data-highlight-theme]').forEach(link => {
+            link.setAttribute('disabled', 'disabled');
+        });
+
+        const themeLink = document.querySelector(`link[data-highlight-theme="${syntaxTheme}"]`);
+        if (themeLink) {
+            themeLink.removeAttribute('disabled');
+        }
+    }
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const currentTheme = getThemePreference();
+        if (currentTheme === 'auto') {
+            applyTheme('auto');
+            applySyntaxTheme();
+        }
+    });
+
+    const savedTheme = getThemePreference();
+    applyTheme(savedTheme);
+    applySyntaxTheme();
+})();
+</script>
+    <meta property="og:site_name" content="Atopic Helper Site Name" />
+    <meta property="og:title" content="Skin Tracker – Atopic Helper" />
+    <meta name="twitter:title" content="Skin Tracker – Atopic Helper" />
+    <meta property="og:url" content="https://alishapckg.github.io/AtopicHelperApp/" />
+    <meta name="twitter:domain" content="alishapckg.github.io" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:dnt" content="on" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body class="container"> 
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+    :root {
+      --gold: #c4a46e;
+      --gold-dark: #7a5a1e;
+      --gold-deeper: #5a3e10;
+      --cream: #FFFDF5;
+      --cream-mid: #f0e6cf;
+      --text-dark: #2c1f08;
+      --text-mid: #5a3e10;
+      --text-light: #a07840;
+      --border: #e8d9b8;
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+    }
+
+    #top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+
+    .top-bar-logo {
+      font-family: 'Lora', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-dark);
+      text-decoration: none;
+      letter-spacing: -0.2px;
+    }
+    .top-bar-logo span { color: var(--gold); }
+
+    #top-bar-nav { display: none; gap: 4px; }
+    #top-bar-nav.visible { display: flex; }
+    #top-bar-nav a {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--text-light);
+      text-decoration: none;
+      transition: background 0.18s, color 0.18s;
+    }
+    #top-bar-nav a:hover { background: var(--cream-mid); color: var(--text-dark); }
+    #top-bar-nav a.active { background: var(--cream-mid); color: var(--gold-dark); font-weight: 500; }
+
+    #top-bar-auth { display: flex; align-items: center; gap: 12px; }
+    #guest-ui { display: none; }
+    #user-ui  { display: none; align-items: center; gap: 12px; }
+
+    .login-link {
+      padding: 8px 18px;
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gold-dark);
+      text-decoration: none;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .login-link:hover { background: var(--cream-mid); border-color: var(--gold-dark); }
+
+    #user-email { font-size: 14px; font-weight: 500; color: var(--text-mid); }
+    #logout-btn {
+      padding: 7px 14px;
+      background: none;
+      border: 1.5px solid var(--gold);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--gold-dark);
+      cursor: pointer;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    #logout-btn:hover { background: var(--cream-mid); border-color: var(--gold-dark); }
+  </style> 
+    <div id="top-bar"> 
+      <a class="top-bar-logo" href="/AtopicHelperApp/">Atopic <span>Helper</span></a> 
+      <nav id="top-bar-nav"> 
+        <a href="/AtopicHelperApp/">Skin Tracker</a> 
+        <!-- <a href="/AtopicHelperApp/food-tracker">Food Tracker</a> --> 
+        <!-- <a href="/AtopicHelperApp/doctor-appointment-preparation">Appointment Prep</a> --> 
+      </nav> 
+      <div id="top-bar-auth"> 
+        <div id="guest-ui"> 
+          <a class="login-link" href="/AtopicHelperApp/auth">Log in</a> 
+        </div> 
+        <div id="user-ui"> 
+          <span id="user-email"></span> 
+          <button id="logout-btn">Log out</button> 
+        </div> 
+      </div> 
+    </div>
+    <div class="ig-main-content"> 
+      <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
+    /* Скрываем страницу до проверки авторизации */
+    body { 
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+
+    .page-hero {
+      text-align: center;
+      padding: 40px 16px 8px;
+      animation: heroIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    @keyframes heroIn { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    .page-hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(26px, 5vw, 38px);
+      font-weight: 600;
+      color: #2c1f08;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
+    }
+    .page-hero p {
+      font-size: 15px;
+      color: #a07840;
+      font-weight: 300;
+      margin: 0;
+    }
+
+    /* selected date bar */
+    .selected-date-container {
+      text-align: center;
+      padding: 14px 16px 20px;
+    }
+    .selected-date-container h3 {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: #7a5a1e;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #f0e6cf;
+      padding: 8px 20px;
+      border-radius: 30px;
+    }
+    #selected-date { color: #5a3e10; font-weight: 600; }
+
+    .loading-indicator {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #7a5a1e; font-size: 13px; font-weight: normal;
+    }
+    .loading-indicator.hidden, .error-indicator.hidden { display: none !important; }
+
+    .page-spinner {
+      width: 13px; height: 13px;
+      border: 2px solid #e8d9b8;
+      border-top-color: #7a5a1e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-indicator {
+      display: inline-block;
+      color: #c44;
+      font-size: 13px;
+      font-weight: normal;
+    }
+
+    /* layout */
+    .calendar-image-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px 28px;
+      box-sizing: border-box;
+    }
+    .calendar-wrapper { width: 100%; max-width: 400px; display: flex; justify-content: center; }
+    
+    /* Body Map Wrapper - Skeleton Loading */
+    .body-map-wrapper { 
+      position: relative; 
+      width: 100%; 
+      max-width: 420px; 
+      flex: 0 0 auto; 
+      opacity: 0; /* Hidden initially */
+      transition: opacity 0.6s ease-out;
+      background-color: #f0e6cf; /* Skeleton background color */
+      border-radius: 20px;
+      /* Reserve space while loading to prevent dots from collapsing to 0 height if percentage based */
+      min-height: 450px; 
+    }
+    .body-map-wrapper.loaded {
+      opacity: 1;
+      background-color: transparent;
+      min-height: auto;
+    }
+
+    .body-map-wrapper img { 
+      width: 100%; 
+      height: auto; 
+      display: block; 
+      border-radius: 20px; 
+      box-shadow: 0 6px 32px rgba(122,90,30,0.14); 
+      /* Hide image initially to prevent pop-in, wrapper shows skeleton instead */
+      opacity: 0; 
+      transition: opacity 0.3s ease;
+    }
+    .body-map-wrapper.loaded img {
+      opacity: 1;
+    }
+
+    @media (min-width: 768px) {
+      .calendar-image-container { flex-direction: row; justify-content: center; align-items: flex-start; padding: 0 28px 28px; }
+      .calendar-wrapper { flex: 0 0 auto; max-width: 380px; }
+      .body-map-wrapper { margin-left: 28px; }
+    }
+
+    /* dots */
+    .dot-btn {
+      position: absolute; width: 16px; height: 16px;
+      border-radius: 50%; border: 2px solid #c4a46e;
+      background: rgba(255,248,230,0.88); cursor: pointer;
+      transform: translate(-50%,-50%);
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+      padding: 0; outline: none;
+      /* Hide dots initially */
+      opacity: 0; 
+    }
+    .body-map-wrapper.loaded .dot-btn {
+      opacity: 1;
+    }
+    .dot-btn:hover { background: rgba(200,160,100,0.4); border-color: #8a6a2e; transform: translate(-50%,-50%) scale(1.35); }
+    .dot-btn.active { background: rgba(136,103,40,0.88); border-color: #5a3e10; }
+    .dot-btn:focus-visible { box-shadow: 0 0 0 3px rgba(196,164,110,0.4); }
+    .dot-tooltip {
+      position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%);
+      background: #fff; border: 1px solid #e0d0b0; border-radius: 7px;
+      padding: 4px 9px; font-size: 11px; font-weight: 500; white-space: nowrap;
+      pointer-events: none; opacity: 0; transition: opacity 0.15s;
+      color: #3a2a0a; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 10;
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+    .dot-btn:hover .dot-tooltip, .dot-btn:focus .dot-tooltip { opacity: 1; }
+
+    /* calendar */
+    .calendar-container {
+      width: 100%; padding: 24px;
+      background: #FFFDF5; border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(196,164,110,0.15);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      box-sizing: border-box;
+      border: 1px solid #e8d9b8;
+    }
+    .month-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .month-title { margin: 0; color: #2c1f08; font-weight: 600; font-size: 17px; flex: 1; text-align: center; font-family: 'Lora', serif; }
+    .nav-button { background: none; border: none; cursor: pointer; padding: 8px 10px; border-radius: 10px; transition: background-color 0.18s; display: flex; align-items: center; justify-content: center; color: #c4a46e; }
+    .nav-button:hover { background-color: #f0e6cf; color: #7a5a1e; }
+    .arrow-icon { width: 18px; height: 18px; display: block; color: currentColor; transition: transform 0.15s; }
+    .nav-button:hover .arrow-icon { transform: scale(1.1); }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .day-header { font-weight: 600; text-align: center; color: #a07840; font-size: 0.78rem; padding-bottom: 6px; letter-spacing: 0.3px; }
+    .day-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.95rem; color: #3a2a0a; transition: all 0.18s; }
+    .day-cell:not(.empty) { cursor: pointer; }
+    .day-cell:not(.today):not(.empty):hover { background-color: #f0e6cf; }
+    .today { background: linear-gradient(135deg, #c4a46e, #a07840); color: #FFFDF5; font-weight: 700; box-shadow: 0 3px 10px rgba(196,164,110,0.4); }
+    .day-cell.selected:not(.today) { background-color: #f0e6cf; color: #7a5a1e; font-weight: 500; }
+    .day-cell.has-data:not(.today):not(.selected)::after { content: ''; display: block; width: 4px; height: 4px; border-radius: 50%; background: #c4a46e; margin: -8px auto 0; }
+
+    /* symptoms section */
+    .symptoms-section { max-width: 860px; margin: 0 auto 60px; padding: 0 16px; font-family: 'DM Sans', system-ui, sans-serif; }
+    .symptoms-hint { text-align: center; color: #bbb; font-size: 14px; margin-bottom: 20px; }
+
+    .area-row {
+      background: #FFFDF5; border: 1px solid #e8d9b8; border-radius: 16px;
+      padding: 18px 20px; margin-bottom: 14px;
+      display: flex; flex-direction: column; gap: 13px;
+      animation: cardSlideIn 0.3s cubic-bezier(0.4,0,0.2,1) both;
+      box-shadow: 0 2px 12px rgba(196,164,110,0.08);
+    }
+    @keyframes cardSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .area-row-header { display: flex; align-items: center; justify-content: space-between; }
+    .area-row-name { font-size: 15px; font-weight: 600; color: #2c1f08; font-family: 'Lora', serif; }
+    .area-remove-btn { background: none; border: none; font-size: 20px; color: #c4a46e; cursor: pointer; line-height: 1; padding: 0 4px; transition: color 0.15s; }
+    .area-remove-btn:hover { color: #8a6a2e; }
+
+    .area-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag-chip {
+      padding: 5px 13px; border-radius: 20px; border: 1.5px solid #c4a46e;
+      background: #fff; font-size: 12.5px; color: #7a5a1e;
+      cursor: pointer; transition: background 0.15s, color 0.15s, transform 0.1s;
+      user-select: none; font-family: 'DM Sans', system-ui, sans-serif;
+    }
+    .tag-chip:hover:not(.selected) { background: rgba(196,164,110,0.18); transform: translateY(-1px); }
+    .tag-chip.selected { background: #7a5a1e; border-color: #5a3e10; color: #fff; }
+
+    .area-bottom-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .area-notes {
+      flex: 1 1 180px; min-width: 0;
+      border: 1.5px solid #e0ccaa; border-radius: 10px;
+      background: rgba(255,248,230,0.6); font-size: 13px; color: #2c2c2e;
+      padding: 8px 11px; resize: none; height: 60px;
+      font-family: 'DM Sans', system-ui, sans-serif; outline: none; box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .area-notes:focus { border-color: #8a6a2e; }
+    .area-add-tag-wrap { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+    .area-add-row { display: flex; gap: 6px; }
+    .area-add-input {
+      border: 1.5px solid #e0ccaa; border-radius: 10px;
+      background: rgba(255,248,230,0.6); font-size: 13px; color: #2c2c2e;
+      padding: 8px 11px; outline: none; width: 130px;
+      font-family: 'DM Sans', system-ui, sans-serif; box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .area-add-input:focus { border-color: #8a6a2e; }
+    .area-add-btn {
+      padding: 8px 14px; border: 1.5px solid #c4a46e; border-radius: 10px;
+      background: transparent; font-size: 13px; color: #7a5a1e; cursor: pointer;
+      font-family: 'DM Sans', system-ui, sans-serif; white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .area-add-btn:hover { background: rgba(196,164,110,0.18); }
+
+    .area-save-btn {
+      align-self: flex-start; padding: 9px 22px;
+      border: none; border-radius: 10px; background: #7a5a1e;
+      color: #FFFDF5; font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      transition: opacity 0.15s, transform 0.12s;
+      box-shadow: 0 3px 10px rgba(122,90,30,0.25);
+    }
+    .area-save-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .area-save-btn:active { transform: translateY(0); }
+
+    .symptoms-empty {
+      text-align: center; padding: 40px 0;
+      color: #c4ad88; font-size: 14px;
+      border: 1.5px dashed #e0d0b0; border-radius: 16px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+    .symptoms-empty .empty-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+
+    /* Custom Modal Styles */
+    .custom-modal-overlay {
+      position: fixed; inset: 0; background: rgba(44, 31, 8, 0.4); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center; z-index: 2000;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+    }
+    .custom-modal-overlay.visible { opacity: 1; pointer-events: auto; }
+    .custom-modal {
+      background: var(--cream); border: 1px solid var(--gold); border-radius: 20px;
+      padding: 24px; max-width: 320px; width: 90%; text-align: center;
+      box-shadow: 0 10px 40px rgba(122, 90, 30, 0.25);
+      transform: scale(0.95); transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .custom-modal-overlay.visible .custom-modal { transform: scale(1); }
+    .custom-modal h3 { font-family: 'Lora', serif; color: var(--text-dark); margin: 0 0 10px; font-size: 20px; }
+    .custom-modal p { color: var(--text-mid); font-size: 15px; line-height: 1.5; margin: 0 0 24px; }
+    .custom-modal-btn {
+      background: var(--gold-dark); color: white; border: none; width: 100%;
+      padding: 12px; border-radius: 12px; font-family: 'DM Sans'; font-weight: 500; font-size: 15px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .custom-modal-btn:hover { background: var(--gold-deeper); }
+  </style> 
+      <div class="page-hero"> 
+        <h1>Skin Tracker</h1> 
+        <p>Select a date and mark affected areas</p> 
+      </div> 
+      <div class="selected-date-container"> 
+        <h3> <span>📅</span> <span id="selected-date">4 June 2026</span> <span id="loading-indicator" class="loading-indicator hidden"> <span class="page-spinner"></span> <span>Loading…</span> </span> <span id="error-indicator" class="error-indicator hidden">⚠ Network error</span> </h3> 
+      </div> 
+      <div class="calendar-image-container"> 
+        <div class="calendar-wrapper"> 
+          <div class="calendar-container"> 
+            <div class="month-header"> 
+              <button class="nav-button" onclick="previousMonth()" aria-label="Previous month"> 
+                <svg class="arrow-icon" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg> </button> 
+              <h2 class="month-title" id="month-title">June 2026</h2> 
+              <button class="nav-button" onclick="nextMonth()" aria-label="Next month"> 
+                <svg class="arrow-icon" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 6l6 6-6 6" />
+                </svg> </button> 
+            </div> 
+            <div class="calendar-grid" id="calendar-grid"> 
+              <div class="day-header">
+                Mon
+              </div>
+              <div class="day-header">
+                Tue
+              </div>
+              <div class="day-header">
+                Wed
+              </div>
+              <div class="day-header">
+                Thu
+              </div>
+              <div class="day-header">
+                Fri
+              </div>
+              <div class="day-header">
+                Sat
+              </div>
+              <div class="day-header">
+                Sun
+              </div>
+              <div class="day-cell" onclick="selectDate(1)">
+                1
+              </div>
+              <div class="day-cell" onclick="selectDate(2)">
+                2
+              </div>
+              <div class="day-cell" onclick="selectDate(3)">
+                3
+              </div>
+              <div class="day-cell today selected" onclick="selectDate(4)">
+                4
+              </div>
+              <div class="day-cell" onclick="selectDate(5)">
+                5
+              </div>
+              <div class="day-cell" onclick="selectDate(6)">
+                6
+              </div>
+              <div class="day-cell" onclick="selectDate(7)">
+                7
+              </div>
+              <div class="day-cell" onclick="selectDate(8)">
+                8
+              </div>
+              <div class="day-cell" onclick="selectDate(9)">
+                9
+              </div>
+              <div class="day-cell" onclick="selectDate(10)">
+                10
+              </div>
+              <div class="day-cell" onclick="selectDate(11)">
+                11
+              </div>
+              <div class="day-cell" onclick="selectDate(12)">
+                12
+              </div>
+              <div class="day-cell" onclick="selectDate(13)">
+                13
+              </div>
+              <div class="day-cell" onclick="selectDate(14)">
+                14
+              </div>
+              <div class="day-cell" onclick="selectDate(15)">
+                15
+              </div>
+              <div class="day-cell" onclick="selectDate(16)">
+                16
+              </div>
+              <div class="day-cell" onclick="selectDate(17)">
+                17
+              </div>
+              <div class="day-cell" onclick="selectDate(18)">
+                18
+              </div>
+              <div class="day-cell" onclick="selectDate(19)">
+                19
+              </div>
+              <div class="day-cell" onclick="selectDate(20)">
+                20
+              </div>
+              <div class="day-cell" onclick="selectDate(21)">
+                21
+              </div>
+              <div class="day-cell" onclick="selectDate(22)">
+                22
+              </div>
+              <div class="day-cell" onclick="selectDate(23)">
+                23
+              </div>
+              <div class="day-cell" onclick="selectDate(24)">
+                24
+              </div>
+              <div class="day-cell" onclick="selectDate(25)">
+                25
+              </div>
+              <div class="day-cell" onclick="selectDate(26)">
+                26
+              </div>
+              <div class="day-cell" onclick="selectDate(27)">
+                27
+              </div>
+              <div class="day-cell" onclick="selectDate(28)">
+                28
+              </div>
+              <div class="day-cell" onclick="selectDate(29)">
+                29
+              </div>
+              <div class="day-cell" onclick="selectDate(30)">
+                30
+              </div> 
+            </div> 
+          </div> 
+          <script>
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    let currentMonth = 5;
+    let currentYear  = 2026;
+    let selectedDay  = 4;
+    const todayDay   = 4;
+    const todayMonth = 5;
+    const todayYear  = 2026;
+
+    function getDaysInMonth(m, y) { return new Date(y, m + 1, 0).getDate(); }
+    function getFirstDayOfMonth(m, y) { return (new Date(y, m, 1).getDay() + 6) % 7; }
+
+    function renderCalendar() {
+      document.getElementById('month-title').textContent = monthNames[currentMonth] + ' ' + currentYear;
+      const dim = getDaysInMonth(currentMonth, currentYear);
+      const off = getFirstDayOfMonth(currentMonth, currentYear);
+      if (selectedDay > dim) selectedDay = dim;
+      document.getElementById('selected-date').textContent = selectedDay + ' ' + monthNames[currentMonth] + ' ' + currentYear;
+      let html = '';
+      weekDays.forEach(function(d) { html += '<div class="day-header">' + d + '</div>'; });
+      for (let i = 0; i < off; i++) html += '<div class="day-cell empty"></div>';
+      for (let day = 1; day <= dim; day++) {
+        const isToday    = day === todayDay && currentMonth === todayMonth && currentYear === todayYear;
+        const isSelected = day === selectedDay;
+        let cls = 'day-cell';
+        if (isToday && isSelected) cls = 'day-cell today selected';
+        else if (isToday)    cls = 'day-cell today';
+        else if (isSelected) cls = 'day-cell selected';
+        html += '<div class="' + cls + '" onclick="selectDate(' + day + ')">' + day + '</div>';
+      }
+      document.getElementById('calendar-grid').innerHTML = html;
+    }
+
+    function previousMonth() {
+      if (--currentMonth < 0) { currentMonth = 11; currentYear--; }
+      renderCalendar(); loadEntryForDate();
+    }
+    function nextMonth() {
+      if (++currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar(); loadEntryForDate();
+    }
+    function selectDate(day) { selectedDay = day; renderCalendar(); loadEntryForDate(); }
+
+    async function loadEntryForDate() {
+      if (typeof window.SupabaseAuth === 'undefined' || typeof window.SkinTracker === 'undefined') return;
+      const { session } = await window.SupabaseAuth.getSession();
+      if (!session) return;
+      const isoDate = currentYear + '-' + String(currentMonth + 1).padStart(2,'0') + '-' + String(selectedDay).padStart(2,'0');
+      showLoading(true);
+      try {
+        const { data, error } = await window.SkinTracker.getEntry(isoDate);
+        if (error) throw error;
+        data ? applyEntryToUI(data) : clearUI();
+      } catch (err) {
+        console.error('Load error:', err);
+        showError();
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function applyEntryToUI(data) {
+      window._activeAreas.clear(); window._selectionOrder.length = 0;
+      if (data.body_areas && Array.isArray(data.body_areas)) {
+        data.body_areas.forEach(function(area) { window._activeAreas.add(area); window._selectionOrder.push(area); });
+      }
+      window.refreshDots && window.refreshDots();
+      window._savedTags = {};
+      if (data.symptoms) { Object.entries(data.symptoms).forEach(function(e) { window._savedTags[e[0]] = new Set(e[1]); }); }
+      window._savedNotes = {};
+      if (data.notes) { Object.entries(data.notes).forEach(function(e) { window._savedNotes[e[0]] = e[1]; }); }
+      window.renderSymptomsTable && window.renderSymptomsTable();
+    }
+
+    function clearUI() {
+      window._activeAreas.clear(); window._selectionOrder.length = 0;
+      window._savedTags = {}; window._savedNotes = {};
+      window.refreshDots && window.refreshDots();
+      window.renderSymptomsTable && window.renderSymptomsTable();
+    }
+
+    function showLoading(on) {
+      var l = document.getElementById('loading-indicator');
+      var e = document.getElementById('error-indicator');
+      if (l) l.classList.toggle('hidden', !on);
+      if (e) e.classList.add('hidden');
+    }
+    function showError() {
+      var l = document.getElementById('loading-indicator');
+      var e = document.getElementById('error-indicator');
+      if (l) l.classList.add('hidden');
+      if (e) { e.classList.remove('hidden'); setTimeout(function() { e.classList.add('hidden'); }, 4000); }
+    }
+
+    renderCalendar();
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(loadEntryForDate, 600);
+    });
+  </script> 
+        </div> 
+        <div class="body-map-wrapper" id="body-map-wrapper"> 
+          <img id="body-map-img" src="/AtopicHelperApp/hooman.jpg" alt="Body map front and back" /> 
+        </div> 
+      </div> 
+      <script>
+  (function() {
+    const bodyAreaPoints = [
+      { name: 'Scalp (Front)',        x: 0.290, y: 0.070 },
+      { name: 'Scalp (Back)',         x: 0.705, y: 0.070 },
+      { name: 'Face',                 x: 0.290, y: 0.135 },
+      { name: 'Neck (Front)',         x: 0.290, y: 0.195 },
+      { name: 'Neck (Back)',          x: 0.705, y: 0.195 },
+      { name: 'Chest',                x: 0.290, y: 0.290 },
+      { name: 'Upper Back',           x: 0.705, y: 0.290 },
+      { name: 'Abdomen',              x: 0.290, y: 0.415 },
+      { name: 'L. Shoulder (Front)',  x: 0.210, y: 0.230 },
+      { name: 'R. Shoulder (Front)',  x: 0.365, y: 0.230 },
+      { name: 'L. Shoulder (Back)',   x: 0.635, y: 0.230 },
+      { name: 'R. Shoulder (Back)',   x: 0.780, y: 0.230 },
+      { name: 'L. Upper Arm (Front)', x: 0.170, y: 0.335 },
+      { name: 'R. Upper Arm (Front)', x: 0.410, y: 0.335 },
+      { name: 'L. Upper Arm (Back)',  x: 0.590, y: 0.335 },
+      { name: 'R. Upper Arm (Back)',  x: 0.830, y: 0.335 },
+      { name: 'L. Forearm (Front)',   x: 0.130, y: 0.445 },
+      { name: 'R. Forearm (Front)',   x: 0.450, y: 0.445 },
+      { name: 'L. Forearm (Back)',    x: 0.550, y: 0.445 },
+      { name: 'R. Forearm (Back)',    x: 0.865, y: 0.445 },
+      { name: 'L. Hand (Front)',      x: 0.140, y: 0.545 },
+      { name: 'R. Hand (Front)',      x: 0.440, y: 0.545 },
+      { name: 'L. Hand (Back)',       x: 0.565, y: 0.545 },
+      { name: 'R. Hand (Back)',       x: 0.845, y: 0.545 },
+      { name: 'Groin',                x: 0.290, y: 0.490 },
+      { name: 'Buttocks',             x: 0.705, y: 0.510 },
+      { name: 'L. Thigh (Front)',     x: 0.235, y: 0.625 },
+      { name: 'R. Thigh (Front)',     x: 0.345, y: 0.625 },
+      { name: 'L. Thigh (Back)',      x: 0.650, y: 0.625 },
+      { name: 'R. Thigh (Back)',      x: 0.760, y: 0.625 },
+      { name: 'L. Knee (Front)',      x: 0.235, y: 0.745 },
+      { name: 'R. Knee (Front)',      x: 0.345, y: 0.745 },
+      { name: 'L. Knee (Back)',       x: 0.660, y: 0.745 },
+      { name: 'R. Knee (Back)',       x: 0.750, y: 0.745 },
+      { name: 'L. Calf (Front)',      x: 0.235, y: 0.840 },
+      { name: 'R. Calf (Front)',      x: 0.345, y: 0.840 },
+      { name: 'L. Calf (Back)',       x: 0.650, y: 0.840 },
+      { name: 'R. Calf (Back)',       x: 0.760, y: 0.840 },
+      { name: 'L. Foot (Front)',      x: 0.215, y: 0.935 },
+      { name: 'R. Foot (Front)',      x: 0.345, y: 0.935 },
+      { name: 'L. Foot (Back)',       x: 0.640, y: 0.935 },
+      { name: 'R. Foot (Back)',       x: 0.770, y: 0.935 },
+    ];
+
+    const areaOrder = [];
+    bodyAreaPoints.forEach(function(pt) {
+      if (!areaOrder.includes(pt.name)) areaOrder.push(pt.name);
+    });
+
+    const activeAreas   = new Set();
+    const selectionOrder = [];
+    const savedTags      = {};
+    const savedNotes     = {};
+
+    window._areaOrder      = areaOrder;
+    window._activeAreas    = activeAreas;
+    window._savedTags      = savedTags;
+    window._savedNotes     = savedNotes;
+    window._selectionOrder = selectionOrder;
+
+    function renderDots() {
+      const wrapper = document.getElementById('body-map-wrapper');
+      bodyAreaPoints.forEach(function(pt) {
+        const btn = document.createElement('button');
+        btn.className = 'dot-btn';
+        btn.setAttribute('aria-label', pt.name);
+        btn.setAttribute('data-area', pt.name);
+        btn.style.left = (pt.x * 100) + '%';
+        btn.style.top  = (pt.y * 100) + '%';
+        const tip = document.createElement('div');
+        tip.className = 'dot-tooltip';
+        tip.textContent = pt.name;
+        btn.appendChild(tip);
+        btn.addEventListener('click', function() { toggleArea(pt.name); });
+        wrapper.appendChild(btn);
+      });
+    }
+
+    function toggleArea(name) {
+      if (activeAreas.has(name)) {
+        activeAreas.delete(name);
+        delete savedTags[name];
+        delete savedNotes[name];
+        const idx = selectionOrder.indexOf(name);
+        if (idx !== -1) selectionOrder.splice(idx, 1);
+      } else {
+        activeAreas.add(name);
+        if (!selectionOrder.includes(name)) selectionOrder.push(name);
+      }
+      refreshDots();
+      window.renderSymptomsTable && window.renderSymptomsTable();
+    }
+
+    function refreshDots() {
+      document.querySelectorAll('.dot-btn').forEach(function(btn) {
+        btn.classList.toggle('active', activeAreas.has(btn.getAttribute('data-area')));
+      });
+    }
+
+    window.refreshDots = refreshDots;
+
+    // --- Image Loading Logic ---
+    const img = document.getElementById('body-map-img');
+    const wrapper = document.getElementById('body-map-wrapper');
+
+    function onImageLoaded() {
+      wrapper.classList.add('loaded');
+    }
+
+    if (img) {
+      // Render dots immediately (they will be hidden until loaded class is added)
+      renderDots();
+
+      if (img.complete) {
+        // Image already cached
+        setTimeout(onImageLoaded, 50);
+      } else {
+        // Wait for load
+        img.addEventListener('load', onImageLoaded);
+        img.addEventListener('error', onImageLoaded); // Reveal on error too so UI is usable
+      }
+    } else {
+      renderDots(); // Fallback
+    }
+    // ----------------------------
+  })();
+  </script> 
+      <div class="symptoms-section" id="symptoms-section"> 
+        <p class="symptoms-hint">Tap dots on the body map to log symptoms for each area</p> 
+        <div id="symptoms-table"></div> 
+      </div> 
+      <script>
+  (function() {
+    var availableTags = [
+      'Itching', 'Redness', 'Dryness', 'Flaking', 'Swelling',
+      'Pain', 'Burning', 'Rash', 'Blisters', 'Cracking',
+      'Bleeding', 'Discoloration', 'Thickening', 'Oozing', 'Warmth'
+    ];
+    var customTags = {};
+
+    function showLoginAlert(msg) {
+      if (document.querySelector('.custom-modal-overlay')) return;
+      const overlay = document.createElement('div');
+      overlay.className = 'custom-modal-overlay';
+      overlay.innerHTML = `
+        <div class="custom-modal">
+          <h3>Authentication Required</h3>
+          <p>${msg}</p>
+          <button class="custom-modal-btn">Log In</button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => overlay.classList.add('visible'));
+
+      const handleRedirect = () => {
+        overlay.classList.remove('visible');
+        setTimeout(() => overlay.remove(), 200);
+        window.location.href = '/AtopicHelperApp/auth?redirect=' + encodeURIComponent(window.location.pathname);
+      };
+
+      overlay.querySelector('.custom-modal-btn').addEventListener('click', handleRedirect);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) handleRedirect();
+      });
+    }
+
+    function tagsForArea(area) { return availableTags.concat(customTags[area] || []); }
+
+    function renderSymptomsTable() {
+      const activeAreas    = window._activeAreas;
+      const selectionOrder = window._selectionOrder;
+      const savedTags      = window._savedTags;
+      const savedNotes     = window._savedNotes;
+      const container      = document.getElementById('symptoms-table');
+      container.innerHTML  = '';
+
+      if (!activeAreas || activeAreas.size === 0) {
+        container.innerHTML = '<div class="symptoms-empty"><span class="empty-icon">🫧</span>No areas selected yet — tap a dot on the body map</div>';
+        return;
+      }
+
+      for (let i = selectionOrder.length - 1; i >= 0; i--) {
+        const area = selectionOrder[i];
+        if (!activeAreas.has(area)) continue;
+
+        const selected = savedTags[area] || new Set();
+        const note     = savedNotes[area] || '';
+        const tags     = tagsForArea(area);
+
+        const card = document.createElement('div');
+        card.className = 'area-row';
+        card.setAttribute('data-area-card', area);
+
+        const header = document.createElement('div');
+        header.className = 'area-row-header';
+        const nameEl = document.createElement('span');
+        nameEl.className = 'area-row-name';
+        nameEl.textContent = area;
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'area-remove-btn';
+        removeBtn.title = 'Remove ' + area;
+        removeBtn.textContent = '×';
+        removeBtn.addEventListener('click', function() {
+          activeAreas.delete(area);
+          delete savedTags[area]; delete savedNotes[area];
+          const idx = selectionOrder.indexOf(area);
+          if (idx !== -1) selectionOrder.splice(idx, 1);
+          window.refreshDots && window.refreshDots();
+          renderSymptomsTable();
+        });
+        header.appendChild(nameEl);
+        header.appendChild(removeBtn);
+        card.appendChild(header);
+
+        const tagsWrap = document.createElement('div');
+        tagsWrap.className = 'area-tags';
+        tags.forEach(function(tag) {
+          const chip = document.createElement('button');
+          chip.className = 'tag-chip' + (selected.has(tag) ? ' selected' : '');
+          chip.textContent = tag;
+          chip.addEventListener('click', function() {
+            if (selected.has(tag)) { selected.delete(tag); } else { selected.add(tag); }
+            if (!savedTags[area]) savedTags[area] = selected;
+            chip.classList.toggle('selected', selected.has(tag));
+          });
+          tagsWrap.appendChild(chip);
+        });
+        card.appendChild(tagsWrap);
+
+        const bottomRow = document.createElement('div');
+        bottomRow.className = 'area-bottom-row';
+
+        const notesEl = document.createElement('textarea');
+        notesEl.className = 'area-notes';
+        notesEl.placeholder = 'Notes for ' + area + '…';
+        notesEl.value = note;
+        notesEl.addEventListener('input', function() { savedNotes[area] = notesEl.value; });
+        bottomRow.appendChild(notesEl);
+
+        const addWrap = document.createElement('div');
+        addWrap.className = 'area-add-tag-wrap';
+        const addRow = document.createElement('div');
+        addRow.className = 'area-add-row';
+        const addInput = document.createElement('input');
+        addInput.type = 'text';
+        addInput.className = 'area-add-input';
+        addInput.placeholder = 'Custom tag…';
+        const addBtn = document.createElement('button');
+        addBtn.className = 'area-add-btn';
+        addBtn.textContent = 'Add';
+
+        function doAddTag() {
+          var raw = (addInput.value || '').trim();
+          if (!raw) return;
+          var normalized = raw.charAt(0).toUpperCase() + raw.slice(1);
+          addInput.value = '';
+          if (!customTags[area]) customTags[area] = [];
+          if (!customTags[area].includes(normalized) && !availableTags.includes(normalized)) customTags[area].push(normalized);
+          if (!savedTags[area]) savedTags[area] = new Set();
+          savedTags[area].add(normalized);
+          renderSymptomsTable();
+        }
+        addBtn.addEventListener('click', doAddTag);
+        addInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); doAddTag(); } });
+        addRow.appendChild(addInput); addRow.appendChild(addBtn);
+        addWrap.appendChild(addRow);
+        bottomRow.appendChild(addWrap);
+        card.appendChild(bottomRow);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'area-save-btn';
+        saveBtn.textContent = 'Save Entry';
+        saveBtn.addEventListener('click', async function() {
+          savedNotes[area] = notesEl.value;
+          if (!savedTags[area]) savedTags[area] = new Set();
+          window.refreshDots && window.refreshDots();
+          saveBtn.textContent = 'Saving…';
+          saveBtn.disabled = true;
+          try {
+            const { session } = await window.SupabaseAuth.getSession();
+            if (!session) {
+              showLoginAlert('Please log in to save your data.');
+              return;
+            }
+            const isoDate = currentYear + '-' + String(currentMonth + 1).padStart(2,'0') + '-' + String(selectedDay).padStart(2,'0');
+            const bodyAreas = Array.from(window._activeAreas);
+            const symptoms = {}, notes = {};
+            Object.entries(window._savedTags || {}).forEach(function(e) {
+              if (e[1] instanceof Set) symptoms[e[0]] = Array.from(e[1]);
+            });
+            Object.entries(window._savedNotes || {}).forEach(function(e) {
+              if (e[1] && e[1].trim()) notes[e[0]] = e[1].trim();
+            });
+            const { data, error } = await window.SkinTracker.saveEntry(isoDate, bodyAreas, symptoms, notes);
+            if (error) throw error;
+            saveBtn.textContent = 'Saved ✓';
+          } catch (err) {
+            console.error('Save error:', err);
+            saveBtn.textContent = 'Error saving ✗';
+          } finally {
+            setTimeout(function() { saveBtn.textContent = 'Save Entry'; saveBtn.disabled = false; }, 1800);
+          }
+        });
+        card.appendChild(saveBtn);
+        container.appendChild(card);
+      }
+    }
+
+    window.renderSymptomsTable = renderSymptomsTable;
+    renderSymptomsTable();
+  })();
+  </script>
+      <script>  (function() {
+    async function protectRoute() {
+      // Ждем загрузки Supabase
+      if (typeof window.SupabaseAuth === 'undefined') {
+        setTimeout(protectRoute, 50);
+        return;
+      }
+
+      try {
+        const { session } = await window.SupabaseAuth.getSession();
+
+        if (session && session.user) {
+          // Пользователь залогинен: показываем страницу
+          document.body.style.opacity = '1';
+        } else {
+          // Пользователь НЕ залогинен: перенаправляем на Auth
+          const currentPath = window.location.pathname;
+          // Используем replace, чтобы не создавать бесконечный цикл в истории браузера
+          window.location.replace('/AtopicHelperApp/auth?redirect=' + encodeURIComponent(currentPath));
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        // В случае ошибки просто показываем страницу или редиректим
+        window.location.replace('/AtopicHelperApp/auth');
+      }
+    }
+    
+    // Запускаем проверку
+    protectRoute();
+  })();</script>
+    </div>
+    <script src="/AtopicHelperApp/supabase-config.js"></script>
+    <script>  function setActiveNav() {
+    var path = window.location.pathname;
+    document.querySelectorAll('#top-bar-nav a').forEach(function(a) {
+      a.classList.toggle('active', a.getAttribute('href') === path);
+    });
+  }
+
+  async function updateAuthUI() {
+    if (typeof window.SupabaseAuth === 'undefined') {
+      setTimeout(updateAuthUI, 100);
+      return;
+    }
+    const { session } = await window.SupabaseAuth.getSession();
+    const guestUI = document.getElementById('guest-ui');
+    const userUI  = document.getElementById('user-ui');
+    const nav     = document.getElementById('top-bar-nav');
+    const emailEl = document.getElementById('user-email');
+
+    if (session && session.user) {
+      guestUI.style.display = 'none';
+      userUI.style.display  = 'flex';
+      nav.classList.add('visible');
+      emailEl.textContent = session.user.email.split('@')[0];
+    } else {
+      guestUI.style.display = 'block';
+      userUI.style.display  = 'none';
+      nav.classList.remove('visible');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    setActiveNav();
+    updateAuthUI();
+
+    var logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async function() {
+        await window.SupabaseAuth.signOut();
+        window.location.href = '/AtopicHelperApp/auth';
+      });
+    }
+  });</script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/ignite-core.js"></script>
+  </body>
+</html>
